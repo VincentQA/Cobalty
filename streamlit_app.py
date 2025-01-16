@@ -1,5 +1,5 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 from openai.error import AuthenticationError, APIConnectionError, InvalidRequestError, RateLimitError
 
 # Titre de l'application
@@ -9,12 +9,12 @@ st.title("Pipeline de Traitement de Fichiers avec Assistants OpenAI")
 api_key = st.text_input("Entrez votre clé API OpenAI", type="password")
 
 if api_key:
-    # Configuration de la clé API OpenAI
-    openai.api_key = api_key
+    # Instanciation du client OpenAI
+    client = OpenAI(api_key=api_key)
 
     # Vérification de la validité de la clé API
     try:
-        openai.Model.list()
+        client.models.list()
         st.success("Clé API valide.")
     except AuthenticationError:
         st.error("Clé API invalide. Veuillez vérifier votre clé et réessayer.")
@@ -43,7 +43,7 @@ if api_key:
         if st.button("Modifier le fichier avec l'Assistant 1"):
             with st.spinner("Modification en cours..."):
                 try:
-                    response = openai.ChatCompletion.create(
+                    response = client.chat.completions.create(
                         model="gpt-4-turbo",
                         messages=[
                             {"role": "system", "content": "Vous êtes l'Assistant 1 chargé de modifier le fichier."},
@@ -66,7 +66,7 @@ if api_key:
                 if st.button("Transmettre à l'Assistant 2 pour traitement"):
                     with st.spinner("Traitement en cours par l'Assistant 2..."):
                         try:
-                            response = openai.ChatCompletion.create(
+                            response = client.chat.completions.create(
                                 model="gpt-4-turbo",
                                 messages=[
                                     {"role": "system", "content": "Vous êtes l'Assistant 2 chargé de traiter le fichier modifié."},
